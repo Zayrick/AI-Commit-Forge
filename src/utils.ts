@@ -20,3 +20,18 @@ export class ProgressHandler {
     );
   }
 }
+
+/**
+ * Sanitizes AI output before placing it into the SCM commit input.
+ * Removes common markdown/code fences and surrounding quotes while preserving multi-line commit bodies.
+ */
+export function sanitizeCommitMessage(raw: string): string {
+  if (!raw) {
+    return '';
+  }
+
+  const cleaned = raw.trim();
+  const withoutCodeFences = cleaned.replace(/```[a-zA-Z0-9_-]*\n|```/g, '');
+  const withoutWrappedQuotes = withoutCodeFences.replace(/^["'`]|["'`]$/g, '');
+  return withoutWrappedQuotes.trim();
+}

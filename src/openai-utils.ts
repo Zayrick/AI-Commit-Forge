@@ -1,5 +1,4 @@
 import OpenAI from 'openai';
-import { ChatCompletionMessageParam } from 'openai/resources';
 import { ConfigKeys, ConfigurationManager } from './config';
 
 /**
@@ -11,7 +10,6 @@ function getOpenAIConfig() {
   const configManager = ConfigurationManager.getInstance();
   const apiKey = configManager.getConfig<string>(ConfigKeys.OPENAI_API_KEY);
   const baseURL = configManager.getConfig<string>(ConfigKeys.OPENAI_BASE_URL);
-  const apiVersion = configManager.getConfig<string>(ConfigKeys.AZURE_API_VERSION);
 
   if (!apiKey) {
     throw new Error('The OPENAI_API_KEY environment variable is missing or empty.');
@@ -20,18 +18,12 @@ function getOpenAIConfig() {
   const config: {
     apiKey: string;
     baseURL?: string;
-    defaultQuery?: { 'api-version': string };
-    defaultHeaders?: { 'api-key': string };
   } = {
     apiKey
   };
 
   if (baseURL) {
     config.baseURL = baseURL;
-    if (apiVersion) {
-      config.defaultQuery = { 'api-version': apiVersion };
-      config.defaultHeaders = { 'api-key': apiKey };
-    }
   }
 
   return config;
@@ -47,11 +39,11 @@ export function createOpenAIApi() {
 }
 
 /**
- * Sends a chat completion request to the OpenAI API.
- * @param {Array<Object>} messages - The messages to send to the API.
+ * Sends a completion request to the OpenAI API using a single prompt string.
+ * @param {string} prompt - The prompt to send to the API.
  * @returns {Promise<string>} - A promise that resolves to the API response.
  */
-export async function ChatGPTAPI(messages: ChatCompletionMessageParam[]) {
+export async function OpenAICompletion(prompt: string): Promise<string | undefined> {
   const openai = createOpenAIApi();
   const configManager = ConfigurationManager.getInstance();
   const model = configManager.getConfig<string>(ConfigKeys.OPENAI_MODEL);
@@ -59,9 +51,9 @@ export async function ChatGPTAPI(messages: ChatCompletionMessageParam[]) {
 
   const completion = await openai.chat.completions.create({
     model,
-    messages: messages as ChatCompletionMessageParam[],
+    messages: [{ role: 'user', content: prompt }],
     temperature
   });
 
-  return completion.choices[0]!.message?.content;
+  return completion.choices[0]?.message?.content ?? undefined;
 }

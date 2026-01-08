@@ -1,40 +1,10 @@
 import * as fs from 'fs-extra';
-import { ChatCompletionMessageParam } from 'openai/resources';
 import * as vscode from 'vscode';
 import { ConfigKeys, ConfigurationManager } from './config';
-import { getDiffStaged } from './git-utils';
-import { ChatGPTAPI } from './openai-utils';
-import { getMainCommitPrompt } from './prompts';
-import { ProgressHandler } from './utils';
-import { GeminiAPI } from './gemini-utils';
-
-/**
- * Generates a chat completion prompt for the commit message based on the provided diff.
- *
- * @param {string} diff - The diff string representing changes to be committed.
- * @param {string} additionalContext - Additional context for the changes.
- * @returns {Promise<Array<{ role: string, content: string }>>} - A promise that resolves to an array of messages for the chat completion.
- */
-const generateCommitMessageChatCompletionPrompt = async (
-  diff: string,
-  additionalContext?: string
-) => {
-  const INIT_MESSAGES_PROMPT = await getMainCommitPrompt();
-  const chatContextAsCompletionRequest = [...INIT_MESSAGES_PROMPT];
-
-  if (additionalContext) {
-    chatContextAsCompletionRequest.push({
-      role: 'user',
-      content: `Additional context for the changes:\n${additionalContext}`
-    });
-  }
-
-  chatContextAsCompletionRequest.push({
-    role: 'user',
-    content: diff
-  });
-  return chatContextAsCompletionRequest;
-};
+import { OpenAICompletion } from './openai-utils';
+import { buildCommitPrompt } from './prompts';
+import { ProgressHandler, sanitizeCommitMessage } from './utils';
+import { getCommitContext } from './commit-context';
 
 /**
  * Retrieves the repository associated with the provided argument.
@@ -73,17 +43,11 @@ export async function generateCommitMsg(arg) {
       const configManager = ConfigurationManager.getInstance();
       const repo = await getRepo(arg);
 
-      const aiProvider = configManager.getConfig<string>(ConfigKeys.AI_PROVIDER, 'openai');
-
       progress.report({ message: 'Getting staged changes...' });
-      const { diff, error } = await getDiffStaged(repo);
 
-      if (error) {
-        throw new Error(`Failed to get staged changes: ${error}`);
-      }
-
-      if (!diff || diff === 'No changes staged.') {
-        throw new Error('No changes staged for commit');
+      const rootPath = repo?.rootUri?.fsPath || vscode.workspace.workspaceFolders?.[0].uri.fsPath;
+      if (!rootPath) {
+        throw new Error('No workspace folder found');
       }
 
       const scmInputBox = repo.inputBox;
@@ -93,48 +57,48 @@ export async function generateCommitMsg(arg) {
 
       const additionalContext = scmInputBox.value.trim();
 
+      const { context: gitContext, changes } = await getCommitContext(rootPath, {
+        preferStaged: true,
+        allowUnstagedFallback: true,
+        additionalContext
+      });
+
+      if (!changes || changes.length === 0) {
+        throw new Error('No changes found for commit');
+      }
+
       progress.report({
         message: additionalContext
           ? 'Analyzing changes with additional context...'
           : 'Analyzing changes...'
       });
-      const messages = await generateCommitMessageChatCompletionPrompt(
-        diff,
-        additionalContext
-      );
+
+      // Build the complete prompt with gitContext injected
+      const prompt = buildCommitPrompt(gitContext);
 
       progress.report({
         message: additionalContext
           ? 'Generating commit message with additional context...'
           : 'Generating commit message...'
       });
-      try {
-        let commitMessage: string | undefined;
 
-        if (aiProvider === 'gemini') {
-          const geminiApiKey = configManager.getConfig<string>(ConfigKeys.GEMINI_API_KEY);
-          if (!geminiApiKey) {
-            throw new Error('Gemini API Key not configured');
-          }
-          commitMessage = await GeminiAPI(messages);
-        } else {
-          const openaiApiKey = configManager.getConfig<string>(ConfigKeys.OPENAI_API_KEY);
-          if (!openaiApiKey) {
-            throw new Error('OpenAI API Key not configured');
-          }
-          commitMessage = await ChatGPTAPI(messages as ChatCompletionMessageParam[]);
+      try {
+        const openaiApiKey = configManager.getConfig<string>(ConfigKeys.OPENAI_API_KEY);
+        if (!openaiApiKey) {
+          throw new Error('OpenAI API Key not configured');
         }
 
+        const commitMessage = await OpenAICompletion(prompt);
 
         if (commitMessage) {
-          scmInputBox.value = commitMessage;
+          scmInputBox.value = sanitizeCommitMessage(commitMessage);
         } else {
           throw new Error('Failed to generate commit message');
         }
       } catch (err) {
         let errorMessage = 'An unexpected error occurred';
 
-        if (aiProvider === 'openai' && err.response?.status) {
+        if (err.response?.status) {
           switch (err.response.status) {
             case 401:
               errorMessage = 'Invalid OpenAI API key or unauthorized access';
@@ -149,8 +113,8 @@ export async function generateCommitMsg(arg) {
               errorMessage = 'OpenAI service is temporarily unavailable';
               break;
           }
-        } else if (aiProvider === 'gemini') {
-          errorMessage = `Gemini API error: ${err.message}`;
+        } else if (err.message) {
+          errorMessage = err.message;
         }
 
         throw new Error(errorMessage);

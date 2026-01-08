@@ -71,7 +71,10 @@ In the VSCode settings, locate the "ai-commit" configuration options and configu
 | GEMINI_MODEL       | string | gemini-2.0-flash-001 |   Yes    |                       Gemini MODEL. Currently, model selection is limited to configuration.                        |
 | GEMINI_TEMPERATURE | number |         0.7          |    No    | Controls randomness in the output. Range: 0-2 for Gemini. Lower values: more focused, Higher values: more creative |
 | AI_COMMIT_LANGUAGE | string |          en          |   Yes    |                                               Supports 19 languages                                                |
-| SYSTEM_PROMPT      | string |         None         |    No    |                                                Custom system prompt                                                |
+| AI_COMMIT_SYSTEM_PROMPT      | string |         None         |    No    |                                          Custom system prompt (overrides default)                                   |
+| AI_COMMIT_INCLUDE_REPO_CONTEXT | boolean |        true        |    No    | Include current branch + recent commits in the context sent to the AI                                               |
+| AI_COMMIT_EXCLUDE_LOCKFILES    | boolean |        true        |    No    | Exclude common lockfiles from diffs sent to the AI                                                                   |
+| AI_COMMIT_MAX_DIFF_CHARS       | number  |         0          |    No    | Max characters of diff to include (0 = unlimited). Useful to avoid context overflow                                 |
 
 ## ⌨️ Local Development
 

@@ -1,7 +1,7 @@
 {
   "name": "ai-commit",
   "displayName": "AI Commit",
-  "description": "Use Azure/OpenAI API to review Git changes, generate conventional commit messages that meet the conventions, simplify the commit process, and keep the commit conventions consistent.",
+  "description": "Use OpenAI API to review Git changes, generate conventional commit messages that meet the conventions, simplify the commit process, and keep the commit conventions consistent.",
   "version": "0.1.1",
   "engines": {
     "node": ">=16",
@@ -11,10 +11,8 @@
     "Other"
   ],
   "keywords": [
-    "Azure",
     "OpenAI",
     "ChatGPT",
-    "GitEmoji",
     "Git Commit",
     "Conventional Commits",
     "Commitizen",
@@ -46,58 +44,6 @@
     ],
     "configuration": {
       "properties": {
-        "ai-commit.AI_COMMIT_LANGUAGE": {
-          "default": "English",
-          "description": "Commit message language",
-          "enum": [
-            "Simplified Chinese",
-            "Traditional Chinese",
-            "Japanese",
-            "Korean",
-            "Czech",
-            "German",
-            "French",
-            "Italian",
-            "Dutch",
-            "Portuguese",
-            "Vietnamese",
-            "English",
-            "Spanish",
-            "Swedish",
-            "Russian",
-            "Bahasa",
-            "Polish",
-            "Turkish",
-            "Thai"
-          ],
-          "enumDescriptions": [
-            "简体中文",
-            "繁體中文",
-            "にほんご",
-            "한국어",
-            "česky",
-            "Deutsch",
-            "française",
-            "italiano",
-            "Nederlands",
-            "português",
-            "tiếng Việt",
-            "english",
-            "español",
-            "Svenska",
-            "русский",
-            "bahasa",
-            "Polski",
-            "Turkish",
-            "ไทย"
-          ],
-          "type": "string"
-        },
-        "ai-commit.AZURE_API_VERSION": {
-          "default": "",
-          "description": "AZURE API VERSION",
-          "type": "string"
-        },
         "ai-commit.OPENAI_API_KEY": {
           "default": "",
           "description": "OpenAI API Key",
@@ -105,18 +51,13 @@
         },
         "ai-commit.OPENAI_BASE_URL": {
           "default": "",
-          "description": "OpenAI BASE URL",
+          "description": "OpenAI API Base URL (leave empty for default OpenAI endpoint)",
           "type": "string"
         },
         "ai-commit.OPENAI_MODEL": {
           "default": "gpt-4o",
           "description": "OpenAI MODEL, you can select a model from the list by running the 'Show Available OpenAI Models' command",
           "type": "string"
-        },
-        "ai-commit.AI_COMMIT_SYSTEM_PROMPT": {
-          "type": "string",
-          "default": "",
-          "description": "Custom system prompt for generating commit messages"
         },
         "ai-commit.OPENAI_TEMPERATURE": {
           "type": "number",
@@ -125,31 +66,27 @@
           "maximum": 2,
           "description": "OpenAI temperature setting (0-2). Higher values make output more random, lower values more deterministic."
         },
-        "ai-commit.AI_PROVIDER": {
-          "type": "string",
-          "default": "openai",
-          "description": "AI Provider to use (OpenAI or Gemini)",
-          "enum": [
-            "openai",
-            "gemini"
-          ]
-        },
-        "ai-commit.GEMINI_API_KEY": {
+        "ai-commit.AI_COMMIT_PROMPT": {
           "type": "string",
           "default": "",
-          "description": "Gemini API Key"
+          "editPresentation": "multilineText",
+          "description": "Custom prompt template for generating commit messages. Use ${gitContext} placeholder to inject git diff context."
         },
-        "ai-commit.GEMINI_MODEL": {
-          "type": "string",
-          "default": "gemini-2.0-flash-001",
-          "description": "Gemini Model to use"
+        "ai-commit.AI_COMMIT_INCLUDE_REPO_CONTEXT": {
+          "type": "boolean",
+          "default": true,
+          "description": "Include repository context (current branch and recent commits) in the prompt sent to the AI"
         },
-        "ai-commit.GEMINI_TEMPERATURE": {
+        "ai-commit.AI_COMMIT_EXCLUDE_LOCKFILES": {
+          "type": "boolean",
+          "default": true,
+          "description": "Exclude common lockfiles from diffs sent to the AI to reduce noise and token usage"
+        },
+        "ai-commit.AI_COMMIT_MAX_DIFF_CHARS": {
           "type": "number",
-          "default": 0.7,
+          "default": 0,
           "minimum": 0,
-          "maximum": 2,
-          "description": "Gemini temperature setting (0-2). Controls randomness."
+          "description": "Maximum number of characters of git diff to include in the prompt (0 = unlimited)"
         }
       },
       "title": "AI Commit"
@@ -195,7 +132,6 @@
     "webpack-cli": "^5.0.1"
   },
   "dependencies": {
-    "@google/generative-ai": "^0.21.0",
     "fs-extra": "^11.0.4",
     "openai": "^4.14.2",
     "simple-git": "^3.17.0"

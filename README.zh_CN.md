@@ -71,7 +71,10 @@
 | GEMINI_MODEL       | string | gemini-2.0-flash-001 | Yes  |                               模型选择仅限于配 Gemini 模型。置。                                |
 | GEMINI_TEMPERATURE | number |         0.7          |  No  |          `Gemini` 控制输出的随机性。范围：0-2。较低的值：更加集中，较高的值：更有创造           |
 | AI_COMMIT_LANGUAGE | string |          en          |  是  |                                         支持 19 种语言                                          |
-| SYSTEM_PROMPT      | string |         None         |  否  |                                        自定义系统提示词                                         |
+| AI_COMMIT_SYSTEM_PROMPT      | string |         None         |  否  |                                  自定义系统提示词（会覆盖默认提示词）                           |
+| AI_COMMIT_INCLUDE_REPO_CONTEXT | boolean |        true        |  否  | 在发送给 AI 的上下文中包含当前分支与最近提交记录                                                 |
+| AI_COMMIT_EXCLUDE_LOCKFILES    | boolean |        true        |  否  | 排除常见 lockfile 的 diff，减少噪音与 token 消耗                                                  |
+| AI_COMMIT_MAX_DIFF_CHARS       | number  |         0          |  否  | 限制发送给 AI 的 diff 最大字符数（0=不限制），用于避免上下文溢出                                   |
 
 ## ⌨️ 本地开发
 
