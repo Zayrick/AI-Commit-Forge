@@ -1,25 +1,12 @@
-<a name="readme-top"></a>
-
 <div align="center">
 
 <img height="120" src="https://github.com/Zayrick/AI-Commit/blob/main/images/logo.png?raw=true">
 
 <h1>AI Commit</h1>
 
-Use OpenAI API to review Git changes, generate conventional commit messages that meet the conventions, simplify the commit process, and keep the commit conventions consistent.
+Generate Conventional Commits messages from your Git changes using OpenAI (or any OpenAI-compatible endpoint).
 
-**English** · [简体中文](./README.zh_CN.md) · [Report Bug][github-issues-link] · [Request Feature][github-issues-link]
-
-<!-- SHIELD GROUP -->
-
-<!-- [![][github-contributors-shield]][github-contributors-link]
-[![][github-forks-shield]][github-forks-link]
-[![][github-stars-shield]][github-stars-link]
-[![][github-issues-shield]][github-issues-link]
-[![][vscode-marketplace-shield]][vscode-marketplace-link]
-[![][total-installs-shield]][total-installs-link]
-[![][avarage-rating-shield]][avarage-rating-link]
-[![][github-license-shield]][github-license-link] -->
+**English** · [简体中文](./README.zh_CN.md) · [Marketplace](https://marketplace.visualstudio.com/items?itemName=Zayrick.ai-commit) · [Issues](https://github.com/Zayrick/AI-Commit/issues)
 
 ![](https://github.com/Zayrick/AI-Commit/blob/main/images/demo.gif?raw=true)
 
@@ -27,105 +14,51 @@ Use OpenAI API to review Git changes, generate conventional commit messages that
 
 ## ✨ Features
 
-- 🤯 Support generating commit messages based on git diffs using OpenAI API (compatible with any OpenAI-compatible endpoint).
-- 🛠️ Support custom prompt template with `${gitContext}` placeholder.
-- 📝 Support Conventional Commits specification.
+- Generate commit messages from staged diffs (with unstaged fallback)
+- Conventional Commits format with intelligent type detection
+- Custom prompt template via `${gitContext}` placeholder
+- Works with OpenAI-compatible `baseUrl` endpoints
+- Smart lockfile exclusion to reduce noise and token usage
+- Repository context support (branch name + recent commits)
+- Model selection via "Show Available OpenAI Models" command
 
-## 📦 Installation
+## 🚀 Quick Start
 
-1. Search for "AI Commit" in VSCode and click the "Install" button.
-2. Install it directly from the [Visual Studio Code Marketplace](https://marketplace.visualstudio.com/items?itemName=Sitoi.ai-commit).
+1. Install **AI Commit** from the VS Code Marketplace.
+2. In VS Code Settings (`ai-commit`), configure:
+   - `OPENAI_API_KEY` (required)
+   - `OPENAI_MODEL` (default: `gpt-4o`)
+3. Stage your changes (`git add ...`) or leave changes unstaged.
+4. Open **Source Control** panel and click the **AI Commit** button.
+5. *(Optional)* Type additional context in the SCM input box before clicking — it will be included in the prompt.
 
-> **Note**\
-> Make sure your node version >= 16
+> **Tips:**
+> - Use "Show Available OpenAI Models" command to browse and select available models
+> - If your diff is too large, stage/commit in smaller chunks or set `AI_COMMIT_MAX_DIFF_CHARS`
+> - Requires Node.js >= 16 and VS Code >= 1.77.0
 
-## 🤯 Usage
+## ⚙️ Configuration
 
-1. Ensure that you have installed and enabled the "AI Commit" extension.
-2. In VSCode settings, locate the "ai-commit" configuration options and configure them as needed.
-3. Make changes in your project and add the changes to the staging area (git add).
-4. (Optional) If you want to provide additional context for the commit message, type it in the Source Control panel's message input box before clicking the AI Commit button.
-5. Next to the commit message input box in the "Source Control" panel, click the "AI Commit" icon button. After clicking, the extension will generate a commit message (considering any additional context if provided) and populate it in the input box.
-6. Review the generated commit message, and if you are satisfied, proceed to commit your changes.
+All settings are under the `ai-commit` namespace in VS Code Settings.
 
-> **Note**\
-> If the code exceeds the maximum token length, consider adding it to the staging area in batches.
+| Setting | Required | Default | Description |
+| --- | :---: | --- | --- |
+| `OPENAI_API_KEY` | ✅ | — | Your OpenAI API key |
+| `OPENAI_MODEL` | — | `gpt-4o` | Model used to generate messages |
+| `OPENAI_BASE_URL` | — | — | Custom base URL for OpenAI-compatible providers |
+| `OPENAI_TEMPERATURE` | — | `0.7` | Randomness ($0$–$2$) |
+| `AI_COMMIT_PROMPT` | — | — | Custom prompt template (use `${gitContext}` placeholder) |
+| `AI_COMMIT_INCLUDE_REPO_CONTEXT` | — | `true` | Include branch name + recent commits in context |
+| `AI_COMMIT_EXCLUDE_LOCKFILES` | — | `true` | Exclude common lockfiles from diff |
+| `AI_COMMIT_MAX_DIFF_CHARS` | — | `0` | Max diff characters (0 = unlimited) |
 
-### ⚙️ Configuration
+## 📜 Commands
 
-In the VSCode settings, locate the "ai-commit" configuration options and configure them as needed:
-
-| Configuration                  |  Type   | Default | Required |                                                        Notes                                                        |
-| :----------------------------- | :-----: | :-----: | :------: | :-----------------------------------------------------------------------------------------------------------------: |
-| OPENAI_API_KEY                 | string  |  None   |   Yes    |                      [OpenAI API Key](https://platform.openai.com/account/api-keys)                                 |
-| OPENAI_BASE_URL                | string  |  None   |    No    |               OpenAI API Base URL (leave empty for default OpenAI endpoint, or use any compatible API)              |
-| OPENAI_MODEL                   | string  | gpt-4o  |   Yes    |       OpenAI MODEL, you can select a model from the list by running the `Show Available OpenAI Models` command      |
-| OPENAI_TEMPERATURE             | number  |   0.7   |    No    |       Controls randomness in the output. Range: 0-2. Lower values: more focused, Higher values: more creative       |
-| AI_COMMIT_PROMPT               | string  |  None   |    No    |    Custom prompt template. Use `${gitContext}` placeholder to inject git diff context. Overrides default prompt.    |
-| AI_COMMIT_INCLUDE_REPO_CONTEXT | boolean |  true   |    No    |                        Include current branch + recent commits in the context sent to the AI                        |
-| AI_COMMIT_EXCLUDE_LOCKFILES    | boolean |  true   |    No    |                                    Exclude common lockfiles from diffs sent to the AI                               |
-| AI_COMMIT_MAX_DIFF_CHARS       | number  |    0    |    No    |                      Max characters of diff to include (0 = unlimited). Useful to avoid context overflow            |
-
-## ⌨️ Local Development
-
-You can use Github Codespaces for online development:
-
-[![][github-codespace-shield]][github-codespace-link]
-
-Alternatively, you can clone the repository and run the following commands for local development:
-
-```bash
-$ git clone https://github.com/sitoi/ai-commit.git
-$ cd ai-commit
-$ npm install
-```
-
-Open the project folder in VSCode. Press F5 to run the project. This will open a new Extension Development Host window and launch the plugin within it.
-
-## 🤝 Contributing
-
-Contributions of all types are more than welcome, if you are interested in contributing code, feel free to check out our GitHub [Issues][github-issues-link] to get stuck in to show us what you’re made of.
-
-[![][pr-welcome-shield]][pr-welcome-link]
-
-### 💗 All Thanks To Our Contributors
-
-[![][github-contrib-shield]][github-contrib-link]
-
-## 🔗 Links
-
-### Credits
-
-- **auto-commit** - <https://github.com/lynxife/auto-commit>
-- **opencommit** - <https://github.com/di-sukharev/opencommit>
-
----
+| Command | Description |
+| --- | --- |
+| `AI Commit` | Generate commit message from current changes |
+| `Show Available OpenAI Models` | Browse and select available models from your API |
 
 ## 📝 License
 
-This project is [MIT](./LICENSE) licensed.
-
-<!-- LINK GROUP -->
-
-[github-codespace-link]: https://codespaces.new/sitoi/ai-commit
-[github-codespace-shield]: https://github.com/sitoi/ai-commit/blob/main/images/codespaces.png?raw=true
-[github-contributors-link]: https://github.com/sitoi/ai-commit/graphs/contributors
-[github-contributors-shield]: https://img.shields.io/github/contributors/sitoi/ai-commit?color=c4f042&labelColor=black&style=flat-square
-[github-forks-link]: https://github.com/sitoi/ai-commit/network/members
-[github-forks-shield]: https://img.shields.io/github/forks/sitoi/ai-commit?color=8ae8ff&labelColor=black&style=flat-square
-[github-issues-link]: https://github.com/sitoi/ai-commit/issues
-[github-issues-shield]: https://img.shields.io/github/issues/sitoi/ai-commit?color=ff80eb&labelColor=black&style=flat-square
-[github-license-link]: https://github.com/sitoi/ai-commit/blob/main/LICENSE
-[github-license-shield]: https://img.shields.io/github/license/sitoi/ai-commit?color=white&labelColor=black&style=flat-square
-[github-stars-link]: https://github.com/sitoi/ai-commit/network/stargazers
-[github-stars-shield]: https://img.shields.io/github/stars/sitoi/ai-commit?color=ffcb47&labelColor=black&style=flat-square
-[pr-welcome-link]: https://github.com/sitoi/ai-commit/pulls
-[pr-welcome-shield]: https://img.shields.io/badge/🤯_pr_welcome-%E2%86%92-ffcb47?labelColor=black&style=for-the-badge
-[github-contrib-link]: https://github.com/sitoi/ai-commit/graphs/contributors
-[github-contrib-shield]: https://contrib.rocks/image?repo=sitoi%2Fai-commit
-[vscode-marketplace-link]: https://marketplace.visualstudio.com/items?itemName=Sitoi.ai-commit
-[vscode-marketplace-shield]: https://img.shields.io/vscode-marketplace/v/Sitoi.ai-commit.svg?label=vscode%20marketplace&color=blue&labelColor=black&style=flat-square
-[total-installs-link]: https://marketplace.visualstudio.com/items?itemName=Sitoi.ai-commit
-[total-installs-shield]: https://img.shields.io/vscode-marketplace/d/Sitoi.ai-commit.svg?&color=greeen&labelColor=black&style=flat-square
-[avarage-rating-link]: https://marketplace.visualstudio.com/items?itemName=Sitoi.ai-commit
-[avarage-rating-shield]: https://img.shields.io/vscode-marketplace/r/Sitoi.ai-commit.svg?&color=green&labelColor=black&style=flat-square
+[MIT](./LICENSE)
