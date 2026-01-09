@@ -1,5 +1,5 @@
 {
-  "name": "ai-commit",
+  "name": "git-ai-commit",
   "displayName": "AI Commit",
   "description": "Use OpenAI API to review Git changes, generate conventional commit messages that meet the conventions, simplify the commit process, and keep the commit conventions consistent.",
   "version": "0.2.0",
