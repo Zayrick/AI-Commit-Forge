@@ -2,11 +2,11 @@
 
 <img height="120" src="https://github.com/Zayrick/AI-Commit/blob/main/images/logo.png?raw=true">
 
-<h1>Commit Forge</h1>
+<h1>AI Commit Forge</h1>
 
 使用 OpenAI（或任何兼容 OpenAI 的接口）根据 Git 修改生成 Conventional Commits 提交信息。
 
-[English](./README.md) · **简体中文** · [商店安装](https://marketplace.visualstudio.com/items?itemName=Zayrick.commitforge) · [问题反馈](https://github.com/Zayrick/AI-Commit/issues)
+[English](./README.md) · **简体中文** · [商店安装](https://marketplace.visualstudio.com/items?itemName=Zayrick.ai-commit-forge) · [问题反馈](https://github.com/Zayrick/AI-Commit/issues)
 
 ![](https://github.com/Zayrick/AI-Commit/blob/main/images/demo.gif?raw=true)
 
@@ -24,12 +24,12 @@
 
 ## 🚀 快速开始
 
-1. 从 VS Code 扩展商店安装 **Commit Forge**。
+1. 从 VS Code 扩展商店安装 **AI Commit Forge**。
 2. 在 VS Code 设置（`ai-commit`）中配置：
    - `OPENAI_API_KEY`（必填）
    - `OPENAI_MODEL`（默认：`gpt-4o`）
 3. 将改动加入暂存区（`git add ...`），或保留未暂存状态。
-4. 打开 **源代码管理（Source Control）** 面板，点击 **Commit Forge** 按钮。
+4. 打开 **源代码管理（Source Control）** 面板，点击 **AI Commit Forge** 按钮。
 5. *（可选）* 点击前可在提交信息输入框中输入额外说明，会一并发送给 AI。
 
 > **提示：**
@@ -56,7 +56,7 @@
 
 | 命令 | 说明 |
 | --- | --- |
-| `Commit Forge` | 根据当前更改生成提交信息 |
+| `AI Commit Forge` | 根据当前更改生成提交信息 |
 | `Show Available OpenAI Models` | 浏览并选择 API 可用的模型 |
 
 ## 📝 License

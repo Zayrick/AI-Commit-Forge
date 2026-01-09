@@ -1,6 +1,6 @@
 {
-  "name": "commitforge",
-  "displayName": "Commit Forge",
+  "name": "ai-commit-forge",
+  "displayName": "AI Commit Forge",
   "description": "Use OpenAI API to review Git changes, generate conventional commit messages that meet the conventions, simplify the commit process, and keep the commit conventions consistent.",
   "version": "0.2.0",
   "engines": {
@@ -44,7 +44,7 @@
       {
         "command": "extension.ai-commit",
         "icon": "$(ai-commit-generator)",
-        "title": "Commit Forge"
+        "title": "AI Commit Forge"
       },
       {
         "command": "ai-commit.showAvailableModels",
@@ -98,7 +98,7 @@
           "description": "Maximum number of characters of git diff to include in the prompt (0 = unlimited)"
         }
       },
-      "title": "Commit Forge"
+      "title": "AI Commit Forge"
     },
     "menus": {
       "scm/title": [
